@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos customizados */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        #envelope {
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+        #envelope:hover {
+            transform: scale(1.05);
+        }
+        .card-item, .option-item {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+        .card-item:hover, .option-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #invitation-content, #details-section {
+            display: none;
+        }
+        #invitation-content.visible {
+            display: block;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+        #details-section.visible {
+            display: block;
+            animation: fadeIn 1.5s ease-in-out forwards;
+        }
+        
+        .seal {
+            width: 70px;
+            height: 70px;
+            background-color: #3b82f6; /* blue-500 */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #ffffff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        #nao-btn {
+            position: relative;
+            transition: transform 0.2s ease-out;
+        }
+        .option-item {
+            cursor: pointer;
+        }
+        .option-item.selected {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        /* Calendar styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        .calendar-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 2.5rem;
+            width: 2.5rem;
+            border-radius: 50%;
+        }
+        .day-header {
+            font-weight: 600;
+            color: #6b7280; /* gray-500 */
+        }
+        .available-date {
+            background-color: #60a5fa; /* blue-400 */
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Envelope View -->
+    <div id="envelope-container" class="text-center">
+        <div id="envelope" class="relative inline-block bg-white rounded-lg shadow-xl p-8" onclick="openInvitation()">
+            <div class="absolute inset-0 bg-gray-50 rounded-lg" style="transform: rotate(-2deg);"></div>
+            <div class="relative w-72 h-48 md:w-96 md:h-64 bg-gray-100 rounded-lg shadow-inner flex items-center justify-center">
+                 <div class="seal">
+                    <span>J</span>
+                 </div>
+                 <div class="absolute top-0 left-0 w-full h-1/2 bg-gray-200" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+            </div>
+        </div>
+        <p class="mt-6 text-gray-500 italic">Um convite para você. Toque para abrir.</p>
+    </div>
+
+    <!-- Invitation View -->
+    <div id="invitation-content" class="w-full max-w-3xl mx-auto p-6 md:p-10 rounded-2xl shadow-xl bg-white border border-gray-200 text-gray-700">
+        <div class="text-center mb-10">
+            <h1 class="font-playfair text-3xl md:text-4xl lg:text-5xl text-blue-600 mb-2">Convite</h1>
+            <p class="font-playfair text-lg md:text-xl text-gray-500">Uma proposta...</p>
+        </div>
+
+        <p class="text-center text-lg text-gray-600 mb-10">Oi, linda, esse convite é com o objetivo de passar um tempo contigo e nos divertirmos.</p>
+
+        <!-- R.S.V.P. -->
+        <div id="rsvp" class="mt-8 text-center card-item p-8 rounded-lg">
+            <h2 class="font-playfair text-3xl text-gray-800 mb-4">Você aceita?</h2>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="showMessage('aceito')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 w-full sm:w-auto">
+                    Eu adoraria!
+                </button>
+                 <button onclick="showMessage('aceito')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 w-full sm:w-auto">
+                    Com certeza
+                </button>
+                <button id="nao-btn" onmouseover="dodgeButton(this)" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg w-full sm:w-auto">
+                    Não
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensagem de Resposta -->
+        <div id="response-message" class="hidden mt-8 p-4 text-center rounded-lg">
+             <p class="text-lg font-semibold"></p>
+        </div>
+
+        <!-- Details Section - Hidden by default -->
+        <div id="details-section">
+            <div class="space-y-8 mt-12">
+                <!-- Opções -->
+                <div class="card-item p-6 rounded-lg">
+                    <h2 class="font-playfair text-2xl text-gray-800 mb-4 text-center">Você tem essas opções para escolher, meu bem:</h2>
+                    <div class="space-y-4" id="options-container">
+                        <div class="option-item p-4 rounded-lg" onclick="selectOption(this)">opção 1 : Sairmos para almoçarmos, ir em um restaurante e trocarmos uma ideia.</div>
+                        <div class="option-item p-4 rounded-lg" onclick="selectOption(this)">opção 2 : Cineminha e algum flíper (Playland ou Game Station).</div>
+                        <div class="option-item p-4 rounded-lg" onclick="selectOption(this)">opção 3 : você vem pra minha casa, peço um ifood, assistimos algo ou só ficarmos ouvindo música e conversarmos.</div>
+                    </div>
+                </div>
+
+                <!-- Objetivo -->
+                <div class="card-item p-6 rounded-lg text-center">
+                    <h2 class="font-playfair text-2xl text-gray-800 mb-3">Objetivo</h2>
+                    <p class="text-gray-600">O objetivo de nos conhecermos melhor e conversarmos sem ter nossos amigos por perto, só eu e você a sós...</p>
+                </div>
+
+                <!-- Datas Livres -->
+                <div class="card-item p-6 rounded-lg">
+                    <h2 class="font-playfair text-2xl text-gray-800 mb-4 text-center">Datas Livres</h2>
+                    <div class="flex justify-center mb-4">
+                        <div class="w-full max-w-xs">
+                            <h3 class="text-center font-semibold text-lg mb-2">Junho 2025</h3>
+                            <div class="calendar-grid">
+                                <!-- Dias da semana -->
+                                <div class="calendar-cell day-header">D</div><div class="calendar-cell day-header">S</div><div class="calendar-cell day-header">T</div><div class="calendar-cell day-header">Q</div><div class="calendar-cell day-header">Q</div><div class="calendar-cell day-header">S</div><div class="calendar-cell day-header">S</div>
+                                <!-- Dias do mês -->
+                                <div class="calendar-cell">1</div><div class="calendar-cell">2</div><div class="calendar-cell">3</div><div class="calendar-cell">4</div><div class="calendar-cell">5</div><div class="calendar-cell">6</div><div class="calendar-cell">7</div>
+                                <div class="calendar-cell">8</div><div class="calendar-cell">9</div><div class="calendar-cell">10</div><div class="calendar-cell">11</div><div class="calendar-cell">12</div><div class="calendar-cell">13</div><div class="calendar-cell">14</div>
+                                <div class="calendar-cell">15</div><div class="calendar-cell available-date">16</div><div class="calendar-cell available-date">17</div><div class="calendar-cell">18</div><div class="calendar-cell">19</div><div class="calendar-cell">20</div><div class="calendar-cell">21</div>
+                                <div class="calendar-cell">22</div><div class="calendar-cell">23</div><div class="calendar-cell">24</div><div class="calendar-cell">25</div><div class="calendar-cell">26</div><div class="calendar-cell">27</div><div class="calendar-cell">28</div>
+                                <div class="calendar-cell">29</div><div class="calendar-cell">30</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-center mt-4">Tenho essas datas livres: dia 16 de junho e 17 de junho. Me diga a melhor opção para ti :) (obs: tudo que eu propus eu pago e se quiser vir para minha casa, faço questão de pagar seu uber)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openInvitation() {
+            const envelope = document.getElementById('envelope-container');
+            const invitation = document.getElementById('invitation-content');
+            
+            envelope.style.transition = 'opacity 0.7s, transform 0.7s';
+            envelope.style.opacity = '0';
+            envelope.style.transform = 'translateY(-100px) scale(0.8)';
+            
+            setTimeout(() => {
+                envelope.style.display = 'none';
+                invitation.classList.add('visible');
+            }, 700);
+        }
+
+        function showMessage(response) {
+            const messageContainer = document.getElementById('response-message');
+            const messageText = messageContainer.querySelector('p');
+            const rsvpSection = document.getElementById('rsvp');
+            const detailsSection = document.getElementById('details-section');
+
+            if (response === 'aceito') {
+                messageText.textContent = 'Eu já sabia, meu bem! Aguardo ansiosamente para te ver';
+                messageContainer.className = 'mt-8 p-4 text-center rounded-lg bg-green-100 border border-green-200 text-green-800';
+                rsvpSection.style.display = 'none'; // Oculta a seção de aceitar
+                detailsSection.classList.add('visible'); // Mostra o restante do conteúdo
+            }
+        }
+        
+        function selectOption(element) {
+            const options = document.querySelectorAll('#options-container .option-item');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function dodgeButton(button) {
+            // Brincadeira de mover o botão
+            const x = Math.random() * 200 - 100;
+            const y = Math.random() * 50 - 25;
+            button.style.transform = `translate(${x}px, ${y}px)`;
+        }
+    </script>
+
+</body>
+</html>
